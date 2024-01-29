@@ -1,31 +1,34 @@
 <?php
+// app/Http/Controllers/QuestionnaireController.php
 
 namespace App\Http\Controllers;
 
+use App\Models\Question;
 use Illuminate\Http\Request;
-use App\Models\Questionnaire; // Assurez-vous d'importer le modèle approprié
 
 class QuestionnaireController extends Controller
 {
     public function index()
     {
-        return view('questionnaire.index');
-    }
+        $currentQuestion = session('currentQuestion', 1);
+        $questionContent = $this->getQuestionContent($currentQuestion);
 
+        return view('questionnaire.index', compact('currentQuestion', 'questionContent'));
+    }
     public function store(Request $request)
     {
-        // Validation des données du formulaire
         $validatedData = $request->validate([
-            // Définissez ici les règles de validation pour chaque champ du formulaire
+            'response' => 'required|string|max:255',
         ]);
 
-        // Création d'un nouveau questionnaire dans la base de données
-        $questionnaire = Questionnaire::create([
-            // Ajoutez les champs du questionnaire avec les données validées
-            // par exemple, 'question' => $validatedData['question']
-        ]);
+        $currentQuestion = $request->session()->get('currentQuestion', 1) + 1;
+        $request->session()->put('currentQuestion', $currentQuestion);
 
-        // Redirection vers une page de confirmation ou autre
-        return redirect('/')->with('success', 'Questionnaire soumis avec succès!');
+        return back(); // Utilisez la méthode back() pour revenir à la page précédente
+    }
+    public function getQuestionContent($questionNumber)
+    {
+        $question = Question::where('question_number', $questionNumber)->first();
+        return $question ? $question->content : null;
     }
 }
