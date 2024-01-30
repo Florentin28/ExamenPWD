@@ -3,8 +3,6 @@
 
 namespace App\Http\Controllers;
 
-// app/Http/Controllers/QuestionnaireController.php
-
 use App\Models\Question;
 use Illuminate\Http\Request;
 
